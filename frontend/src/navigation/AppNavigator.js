@@ -1,7 +1,8 @@
 const Stack = createStackNavigator();
 import { createStackNavigator } from "@react-navigation/stack";
-import SignUp from "../screens/SignupScreen";
-import SignIn from "../screens/SignInScreen";
+import SignUp from "../screens/auth/SignupScreen.js";
+import SignIn from "../screens/auth/SignInScreen.js";
+import { HomeScreen } from "../screens/home/HomeScreen.js";
 
 
 const AppNavigator = () => (
@@ -11,7 +12,7 @@ const AppNavigator = () => (
   >
     <Stack.Screen name="SignUp" component={SignUp} />
     <Stack.Screen name="SignIn" component={SignIn} />
-     
+    <Stack.Screen name="Home" component={HomeScreen} />
   </Stack.Navigator>
 );
 

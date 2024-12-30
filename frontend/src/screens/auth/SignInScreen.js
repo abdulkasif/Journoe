@@ -1,58 +1,34 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Import useNavigation
+import CheckUserData from '../../hooks/auth/checkUserData';
 
-export default function SignUp() {
-  const navigation = useNavigation();  // Replace useRouter with useNavigation
+
+export default function SignIn() {
+  const navigation = useNavigation();  // Initialize useNavigation
 
   // Input states
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [generatedOtp, setGeneratedOtp] = useState(null);
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-  // Mock list of registered emails (for testing purposes)
-  const registeredEmails = ['test@example.com', 'user1@domain.com'];
-
-  // Basic email validation regex
+   // Basic email validation regex
   const validateEmail = (email) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(email);
   };
 
-  // Phone number validation (basic check for length)
-  const validatePhone = (phone) => {
-    return phone.length === 10 && /^[0-9]+$/.test(phone);
-  };
 
   const handleSendOtp = () => {
-    if (!name || !email || !password || !confirmPassword || !phone) {
+    if (!email || !password ) {
       alert('Please fill in all fields');
       return;
     }
 
     if (!validateEmail(email)) {
       alert('Please enter a valid email');
-      return;
-    }
-
-    if (!validatePhone(phone)) {
-      alert('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-
-    // Check if the email is already registered
-    if (registeredEmails.includes(email)) {
-      alert('This email is already registered. Please use a different email.');
       return;
     }
 
@@ -64,28 +40,33 @@ export default function SignUp() {
     console.log(`Generated OTP: ${otp}`);
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     if (otp === generatedOtp) {
-      alert('OTP verified successfully!');
-      console.log(`Name: ${name}, Email: ${email}, Phone: ${phone}, Password: ${password}`);
-      navigation.navigate('SignIn');  // Use navigate to move to the SignIn screen
+        const formData = JSON.stringify({email, password});
+        const response = await CheckUserData(formData)
+
+        if(response.ok){
+          Alert.alert("Logged in Successfully");
+          navigation.navigate('Home')
+        }
     } else {
       alert('Invalid OTP. Please try again.');
     }
   };
 
+//   // Handle Sign In
+//   const handleSignIn = () => {
+//     // Example of handling sign in, navigate to home page after sign-in
+//     console.log(`Email: ${email}, Password: ${password}`);
+//     navigation.replace('signup'); // Navigate to home screen after successful login
+//   };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Start Your Journey with Us!!</Text>
+      <Text style={styles.title}>Let's Sign You In</Text>
 
       <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          placeholderTextColor="#A0A0A0"
-          value={name}
-          onChangeText={setName}
-        />
+        {/* Email Input */}
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -93,14 +74,8 @@ export default function SignUp() {
           value={email}
           onChangeText={setEmail}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          placeholderTextColor="#A0A0A0"
-          value={phone}
-          keyboardType="numeric"
-          onChangeText={setPhone}
-        />
+
+        {/* Password Input */}
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -109,41 +84,42 @@ export default function SignUp() {
           value={password}
           onChangeText={setPassword}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          placeholderTextColor="#A0A0A0"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
 
         {isOtpSent ? (
-          <>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter OTP"
-              placeholderTextColor="#A0A0A0"
-              value={otp}
-              onChangeText={setOtp}
-              keyboardType="numeric"
-            />
-            <TouchableOpacity onPress={handleVerifyOtp} style={styles.button}>
-              <Text style={styles.buttonText}>Verify OTP</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <TouchableOpacity onPress={handleSendOtp} style={styles.button}>
-            <Text style={styles.buttonText}>Send OTP</Text>
-          </TouchableOpacity>
-        )}
+                  <>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter OTP"
+                      placeholderTextColor="#A0A0A0"
+                      value={otp}
+                      onChangeText={setOtp}
+                      keyboardType="numeric"
+                    />
+                    <TouchableOpacity onPress={handleVerifyOtp} style={styles.button}>
+                      <Text style={styles.buttonText}>Sign In</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <TouchableOpacity onPress={handleSendOtp} style={styles.button}>
+                    <Text style={styles.buttonText}>Send OTP</Text>
+                  </TouchableOpacity>
+                )}
+
+        {/* Sign In Button
+        <TouchableOpacity onPress={handleSignIn} style={styles.button}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity> */}
       </View>
 
-      <View style={styles.signinLink}>
-        <Text style={styles.signinText}>
-          Already have an account?{' '}
-          <Text style={styles.link} onPress={() => navigation.navigate('SignIn')}>  {/* Navigate to the SignIn screen */}
-            Sign In
+      {/* Sign Up Link */}
+      <View style={styles.signupLink}>
+        <Text style={styles.signupText}>
+          Don't have an account?{" "}
+          <Text
+            style={styles.link}
+            onPress={() => navigation.navigate('SignUp')}  // Navigate to Sign Up page
+          >
+            Sign Up
           </Text>
         </Text>
       </View>
@@ -156,8 +132,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 25,
+    marginTop: 0,
     backgroundColor: '#F7F7F7',
-    paddingHorizontal: 20,
   },
   title: {
     fontSize: 30,
@@ -201,11 +178,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  signinLink: {
+  signupLink: {
     marginTop: 20,
     alignItems: 'center',
   },
-  signinText: {
+  signupText: {
     fontSize: 16,
     color: '#777',
   },

@@ -1,6 +1,7 @@
 //Installing dependencies
 const express = require('express')
 const dotenv = require('dotenv')
+const cors = require('cors')
 const { dbconn } = require('./src/connection/dbconn')
 const AuthRoutes = require('./src/routes/AuthRoutes.js')
 
@@ -10,6 +11,7 @@ const AuthRoutes = require('./src/routes/AuthRoutes.js')
 //Configuring dependencies
 const app = express()
 dotenv.config()
+app.use(cors())
 app.use(express.json())
 
 //Initialling Variables 
